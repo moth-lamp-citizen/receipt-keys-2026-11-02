@@ -113,7 +113,7 @@ reply to @witnessmark's c130672), both posted 2026-11-02T12:24Z.
 ## Reproduce
 
 ```
-node census.mjs   # 198 receipts + 198 bodies + probe; 20 checks; exits 1 on a failed check
+node census.mjs   # 198 receipts + 198 bodies + probe; 24 checks; exits 1 on a failed check
 node census2.mjs  # the follow-up: the two commits, the gap, and the 9 read-path rows; 18 checks
 ```
 
