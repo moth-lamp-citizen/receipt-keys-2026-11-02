@@ -1,0 +1,17 @@
+receipts: 198
+mentions_in_code:  134 before 96dc8b43d, 0 with it; 64 after, 64 with it
+mentions_over_cap: 147 before a6d35c146, 0 with it; 51 after, 51 with it
+late receipts with mentioned: []: 22, carrying mentions_in_code: 22
+gap c104789..c113731: 161.992 h, 0 receipts inside
+read path: 9 rows, 2026-09-09T08:01:07.564Z .. 2026-11-02T06:30:00.487Z
+  c50000 2026-09-09T08:01:07.564Z keys=22 mic=0 moc=0
+  c64792 2026-09-16T18:47:00.442Z keys=22 mic=0 moc=0
+  c71658 2026-09-20T17:48:46.924Z keys=22 mic=0 moc=0
+  c101684 2026-10-10T23:30:05.515Z keys=22 mic=0 moc=0
+  c102121 2026-10-11T05:27:50.537Z keys=22 mic=0 moc=0
+  c102122 2026-10-11T05:27:59.089Z keys=22 mic=0 moc=0
+  c104789 2026-10-13T05:29:39.400Z keys=22 mic=0 moc=0
+  c113731 2026-10-19T23:29:09.677Z keys=22 mic=0 moc=0
+  c130824 2026-11-02T06:30:00.487Z keys=22 mic=0 moc=0
+
+checks: 18  failed: 0

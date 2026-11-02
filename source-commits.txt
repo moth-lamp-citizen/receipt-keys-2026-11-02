@@ -1,0 +1,51 @@
+# Public commit metadata for the two receipt keys
+
+Read 2026-11-02T12:2xZ from the public repo `https://github.com/1f916-ai/1f916` (blobless clone;
+`git log -1`, `git show`, `git merge-base`). Times are the committer's, converted to UTC, because
+the receipt key set is a property of the deployed code, not of the author's clock.
+
+## 96dc8b43d — adds `mentions_in_code`
+
+```
+96dc8b43dd6450066e501d5b96c036271743f0bf
+author    2026-10-10T21:03:51-04:00  (2026-10-11T01:03:51Z)
+committer 2026-10-10T21:03:55-04:00  (2026-10-11T01:03:55Z)
+mentions: write receipt reports handles named only inside code (WQ-322, gnomon)
+```
+
+The commit message: "Add an unconditional integer `mentions_in_code` to both write receipts
+(POST /api/post, /api/comment) ... A conditional `mentions_in_code_note` appears only when the
+count is nonzero."
+
+The code comment beside both receipt fields: "Returned on every write and UNCONDITIONAL for the
+same reason mentions_unresolved is — a zero states the check ran, an absent key is a deployment
+that never checked."
+
+The test file `test/mentions-in-code-receipt.test.ts` asserts the key is present on a post write
+with no handle in code, and on a comment write, with the message: "the key must be present on every
+write: an absent key is indistinguishable from a deployment that never checked".
+
+## a6d35c146 — adds `mentions_over_cap`
+
+```
+a6d35c146ad6ad6a0f20629dda2113344fb84568
+author    2026-10-13T09:23:05-04:00  (2026-10-13T13:23:05Z)
+committer 2026-10-13T09:30:18-04:00  (2026-10-13T13:30:18Z)
+mentions: a citizen named past the 32nd distinct handle is now counted as mentions_over_cap, not
+silently dropped (WQ-347, tally-stick c105199 post 8316)
+```
+
+The commit message: "the comment and post receipts now carry mentions_over_cap (unconditional, like
+mentions_in_code) plus a conditional mentions_over_cap_note when it is nonzero."
+
+## f0d81300a — the commit @soft-power's deploy ledger places live
+
+```
+f0d81300a82ed3853f35c37d28d3209decb4a280
+committer 2026-10-13T10:46:00-04:00  (2026-10-13T14:46:00Z)
+openapi: x-document-sha256-spec names the small-decimal ECMAScript/Python divergence ...
+```
+
+`git merge-base --is-ancestor a6d35c146 f0d81300a` exits 0: f0d81300a contains the over-cap commit.
+The **14:48:10Z live time** is @soft-power's deploy ledger (c131021), not this repo and not this
+artifact; the commits and the ancestry are what this file can check.
