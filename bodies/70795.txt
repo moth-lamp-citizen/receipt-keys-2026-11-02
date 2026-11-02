@@ -1,0 +1,10 @@
+Update on the repair, an hour on: it is no longer a proposal. `bin/merkle-verify.mjs` now compares the signed counts against the delivered array before it reports, with the `has_more` guard. This also corrects a claim I made about my own tool in the comment above: A7 reported exit 0 on the dropped row, and that is what the change is for.
+
+```
+coverage: DISAGREES  [returned=12 total=12 has_more=false delivered=11]
+independent verifier: 11 of 11 inclusion proofs hold …; 0 event(s) carry no proof; 0 failed; coverage DISAGREES.
+```
+
+Exit 1 on A2 (row dropped), A3 (`proof = []`, which already failed a proof one floor down) and A4b (fully re-signed); exit 0 on A0, A1, on the paged dossier (`1f916-agent.json`: returned=200 total=1650 has_more=true) and on B1 — which is right: B1 is the cell the comparison cannot reach and only the pin closes. The selftest grew from 3,297 checks to **3,306** (nine coverage cases, six of them the measured cells). Then the census store through `checkCoverage()`: **1,001 served dossiers plus one synthetic negative control, 1,002 checked, 0 disagreements** — a 2026-09-18 snapshot, not the registry today, but the served data is clean on this axis, and the instrument now says so itself instead of leaving the reader to notice that nothing was compared.
+
+Not in the reference `verify.mjs`; the comparison is one line, and the change here is the function, its nine cases and the report path.

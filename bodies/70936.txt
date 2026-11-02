@@ -1,0 +1,153 @@
+parseRetryAfter(headerValue, nowMs) -> number | null  — RFC 9110 §10.2.3
+Node 18+, CommonJS, no dependencies. Licence: MIT.
+
+=== parseRetryAfter.js ===
+'use strict';
+// parseRetryAfter(headerValue, nowMs) -> number | null
+// RFC 9110 §10.2.3 (Retry-After). Node 18+, CommonJS, no dependencies. Licence: MIT.
+// The clock is never read: nowMs is required and is the only time source.
+
+const MAX_DELTA_SECONDS = 2147483647; // 2^31 - 1; larger values are refused per the order brief
+
+const IMF_FIXDATE = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT$/;
+const MONTH = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+
+function parseRetryAfter(headerValue, nowMs) {
+  try {
+    if (typeof headerValue !== 'string') return null;           // absent, null, undefined, numbers
+    if (typeof nowMs !== 'number' || !Number.isFinite(nowMs)) return null;
+
+    const value = headerValue.replace(/^[ \t]+|[ \t]+$/g, ''); // OWS is SP and HTAB only (RFC 9110 §5.6.3)
+    if (value === '') return null;
+
+    // delta-seconds: ASCII digits only. "-1", "1.5", "1e3", "5s" are refused here.
+    if (/^[0-9]+$/.test(value)) {
+      const seconds = Number(value);
+      return seconds <= MAX_DELTA_SECONDS ? seconds : null;
+    }
+
+    // HTTP-date: IMF-fixdate only. RFC 850 and asctime are refused even though Date.parse takes them.
+    const m = IMF_FIXDATE.exec(value);
+    if (!m) return null;
+    const day = Number(m[2]);
+    const month = MONTH[m[3]];
+    const year = Number(m[4]);
+    const hour = Number(m[5]);
+    const minute = Number(m[6]);
+    const second = Number(m[7]);
+    if (hour > 23 || minute > 59 || second > 59) return null;    // ":60" (leap second) cannot be represented here
+
+    // Date.UTC maps years 0-99 into the 1900s; setUTCFullYear does not.
+    const when = new Date(0);
+    when.setUTCFullYear(year, month, day);
+    when.setUTCHours(hour, minute, second, 0);
+    const ms = when.getTime();
+
+    // Reject calendar overflow ("31 Feb" would normalise to March) and any other rewrite.
+    if (when.getUTCFullYear() !== year || when.getUTCMonth() !== month || when.getUTCDate() !== day ||
+        when.getUTCHours() !== hour || when.getUTCMinutes() !== minute || when.getUTCSeconds() !== second) return null;
+
+    const remainingMs = ms - nowMs;
+    if (remainingMs <= 0) return 0;                              // in the past, or exactly now
+    const seconds = Math.ceil(remainingMs / 1000);               // whole seconds, rounded up
+    return seconds <= MAX_DELTA_SECONDS ? seconds : null;
+  } catch (_) {
+    return null;                                                 // never throws
+  }
+}
+
+module.exports = { parseRetryAfter };
+
+=== parseRetryAfter.test.js ===
+'use strict';
+// Hand-derived expectations. Run: node --test parseRetryAfter.test.js
+const { test } = require('node:test');
+const assert = require('node:assert');
+const { parseRetryAfter } = require('./parseRetryAfter.js');
+
+const D = (y, mo, d, h, mi, s, ms = 0) => Date.UTC(y, mo - 1, d, h, mi, s, ms);
+const HTTP = 'Wed, 21 Oct 2026 07:28:00 GMT';
+
+test('delta-seconds: digits are seconds, OWS trimmed', () => {
+  assert.strictEqual(parseRetryAfter('120', 0), 120);
+  assert.strictEqual(parseRetryAfter(' 5 ', 0), 5);
+  assert.strictEqual(parseRetryAfter('\t5\t', 0), 5);
+  assert.strictEqual(parseRetryAfter('0', 0), 0);
+  assert.strictEqual(parseRetryAfter('0000000005', 0), 5);
+});
+
+test('only OWS is trimmed: a NBSP is not whitespace here', () => {
+  assert.strictEqual(parseRetryAfter('\u00a05', 0), null);
+});
+
+test('delta-seconds: anything not all digits is null', () => {
+  for (const bad of ['-1', '1.5', '1e3', '5s', '', '   ', '+5', '5 5', 'soon']) {
+    assert.strictEqual(parseRetryAfter(bad, 0), null, JSON.stringify(bad));
+  }
+});
+
+test('delta-seconds: above 2^31-1 is null, the boundary itself is kept', () => {
+  assert.strictEqual(parseRetryAfter('2147483647', 0), 2147483647);
+  assert.strictEqual(parseRetryAfter('2147483648', 0), null);
+});
+
+test('absent or wrong-typed input is null and the call never throws', () => {
+  assert.strictEqual(parseRetryAfter(null, 0), null);
+  assert.strictEqual(parseRetryAfter(undefined, 0), null);
+  assert.strictEqual(parseRetryAfter(120, 0), null);
+  assert.strictEqual(parseRetryAfter({}, 0), null);
+  assert.strictEqual(parseRetryAfter(HTTP, NaN), null);
+  assert.strictEqual(parseRetryAfter(HTTP, Infinity), null);
+  assert.strictEqual(parseRetryAfter(HTTP), null);
+});
+
+test('HTTP-date: whole seconds between the date and nowMs', () => {
+  assert.strictEqual(parseRetryAfter(HTTP, D(2026, 10, 21, 7, 27, 30)), 30);
+});
+
+test('HTTP-date: seconds are rounded UP', () => {
+  assert.strictEqual(parseRetryAfter(HTTP, D(2026, 10, 21, 7, 27, 30, 500)), 30); // 29.5 s -> 30
+  assert.strictEqual(parseRetryAfter(HTTP, D(2026, 10, 21, 7, 27, 59, 999)), 1);  // 1 ms   -> 1
+});
+
+test('HTTP-date: the date itself and any past date return 0', () => {
+  assert.strictEqual(parseRetryAfter(HTTP, D(2026, 10, 21, 7, 28, 0)), 0);
+  assert.strictEqual(parseRetryAfter(HTTP, D(2026, 10, 21, 7, 28, 1)), 0);
+  assert.strictEqual(parseRetryAfter(HTTP, D(2027, 1, 1, 0, 0, 0)), 0);
+});
+
+test('formats Date.parse accepts but RFC 9110 does not are null', () => {
+  assert.strictEqual(parseRetryAfter('2026-10-21', 0), null);
+  assert.strictEqual(parseRetryAfter('tomorrow', 0), null);
+  assert.strictEqual(parseRetryAfter('Wednesday, 21-Oct-26 07:28:00 GMT', 0), null); // RFC 850
+  assert.strictEqual(parseRetryAfter('Sun Nov  6 08:49:37 1994', 0), null);          // asctime
+});
+
+test('impossible dates and times are null, not normalised', () => {
+  assert.strictEqual(parseRetryAfter('Wed, 31 Feb 2027 00:00:00 GMT', 0), null);
+  assert.strictEqual(parseRetryAfter('Wed, 21 Oct 2026 24:00:00 GMT', 0), null);
+  assert.strictEqual(parseRetryAfter('Wed, 21 Oct 2026 07:28:60 GMT', 0), null);
+});
+
+test('a date so far out that its seconds exceed 2^31-1 is null', () => {
+  assert.strictEqual(parseRetryAfter('Sun, 21 Oct 2097 07:28:00 GMT', 0), null);
+  assert.strictEqual(parseRetryAfter(HTTP, 0), 1792567680); // inside the cap, so returned
+});
+
+=== captured run: node --test parseRetryAfter.test.js ===
+# node v26.0.0
+tests 11, pass 11, fail 0, duration 74 ms, exit=0   (captured 2026-09-20)
+All four examples from the order brief are asserted (120; the 30-second date; the 500 ms clock; 'soon' -> null).
+
+=== assumptions and limitations ===
+1. The clock is never read: nowMs is required; a non-finite nowMs returns null.
+2. delta-seconds are returned as-is; only the HTTP-date form is rounded UP (Math.ceil of the remaining ms).
+3. IMF-fixdate is enforced by regex, so RFC 850 and asctime are null even though Date.parse accepts them.
+4. Calendar overflow is rejected by round-tripping the parsed components ('31 Feb' -> null, not 3 March).
+5. THE DAY-NAME IS NOT CHECKED AGAINST ITS DATE: RFC 9110 gives the grammar, not weekday consistency,
+   so 'Tue, 21 Oct 2026 07:28:00 GMT' (a Wednesday) returns a number. One more line refuses it on request.
+6. Only OWS (SP and HTAB) is trimmed; a NBSP before the digits makes the value invalid, not 5.
+7. ':60' (leap second) is refused: this runtime cannot represent it without normalising to the next minute.
+8. Delta-seconds and computed differences above 2^31-1 (2147483647) are null, per the order brief.
+9. A non-string headerValue (including 120 as a number) is null, not coerced.
+10. Nothing is mutated and the function never throws (its body is inside try/catch).

