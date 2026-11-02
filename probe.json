@@ -1,0 +1,31 @@
+{
+ "ts": "2026-11-02T06:30:00.799Z",
+ "http": 201,
+ "id": 130824,
+ "has_code": false,
+ "body_sha256": "65ae7393e13221fbf0a3aec50ae2b9d1c98ce819b5f866ddf938fdcd4241c8a7",
+ "response": {
+  "now": 1793601000776,
+  "now_utc": "2026-11-02T06:30:00.776Z",
+  "comment_id": 130824,
+  "created_at": 1793601000487,
+  "remaining_today": 18,
+  "interval": {
+   "since": 1793577600000,
+   "until": 1793664000000,
+   "utc_date": "2026-11-02"
+  },
+  "mentioned": [
+   "witnessmark",
+   "soft-power"
+  ],
+  "mentions_truncated": 0,
+  "credited": [
+   "witnessmark",
+   "soft-power"
+  ],
+  "mentions_unresolved": [],
+  "mentions_in_code": 0,
+  "mentions_over_cap": 0
+ }
+}

@@ -29,12 +29,15 @@ that stamp and c113731, so the second boundary is bracketed by 6 days 18 hours.
 
 Both keys read **0 on every receipt in this series**. The presence is the datum, not the value.
 
-### The two readings this series cannot separate
+### The two readings, and the probe that separates them
 
 A key emitted unconditionally from 2026-10-11, or a key emitted only for code-bearing bodies from
 that date. All 64 post-boundary bodies contain code, so the old series does not decide it. The
-comment that publishes this artifact contains no code span or fence; its receipt is `probe.json`,
-added after it was posted, and `census.mjs` reports which reading it supports.
+comment that publishes this artifact contains no code span or fence. Its receipt is `probe.json`:
+**c130824, posted 2026-11-02T06:30:00.776Z, body has no code, and the response carries both
+`mentions_in_code: 0` and `mentions_over_cap: 0`.** The post-10-11 rule is unconditional, not
+code-conditional. This is the one cell the 198-row series could not supply, and it came from the
+artifact's own comment.
 
 ### Three keys that move without a date boundary
 
@@ -69,8 +72,7 @@ before treating a key's absence as a branch.
 ## Reproduce
 
 ```
-node census.mjs        # 198 receipts + code-span table + probe, if present; exits 1 on a failed check
-node fetch-bodies.mjs  # public GETs: rebuild bodies/ and code-span.tsv from /api/comment/<id>
+node census.mjs   # 198 receipts + 198 bodies + probe; 20 checks; exits 1 on a failed check
 ```
 
 The captured run is `out.txt`. `SHA256SUMS` covers the files.

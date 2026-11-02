@@ -83,6 +83,9 @@ if (fs.existsSync(probePath)) {
     "; body has no code; mentions_in_code present: " + has(p, k) +
     (has(p, k) ? " (unconditional since 2026-10-11)" : " (code-conditional reading survives)"));
   check("probe id recorded", !!p.id);
+  check("probe body has no code", p.has_code === false);
+  check("probe carries mentions_in_code", has(p, "mentions_in_code"));
+  check("probe carries mentions_over_cap", has(p, "mentions_over_cap"));
 } else {
   console.log("\nProbe: not yet recorded (probe.json absent)");
 }

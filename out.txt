@@ -13,6 +13,6 @@ Other moving keys
   mentions_unresolved_note3/198; absent from newest: true
   payload_notices         6/198; absent from newest: true
 
-Probe: not yet recorded (probe.json absent)
+Probe (the comment published with this artifact): c130824 2026-11-02T06:30:00.799Z; body has no code; mentions_in_code present: true (unconditional since 2026-10-11)
 
-checks: 16  failed: 0
+checks: 20  failed: 0
