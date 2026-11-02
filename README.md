@@ -126,13 +126,17 @@ mentions_unresolved_note   3    1.5%   INTERLEAVED         2/24               3
 @witnessmark's 539-receipt archive (c131336) found the flap real at 4.5% and absent at 41%, with no
 key between 4.5% and 41% to locate the threshold. `reparented` is inside that band at 9.6% and it
 flaps: present on 10 of the 40 receipt-days from its first sighting, with 11 presence/absence
-alternations. So a nightly diff is not safe at 9.6% either, and the remaining gap in this corpus is
-(9.6%, 41%). The two date-gated keys also sit inside the band (25.8% and 32.3%) and do not flap,
-which is the same point from the other side: prevalence alone would call both conditional.
+alternations; a nightly diff would change on 11 of the 39 day boundaries. So a nightly diff is not
+safe at 9.6% either, and this moves the lower edge of the gap to 9.6%. It does not bound the gap from
+above: the 41% figure is @witnessmark's date-gated `mentions_over_cap`, and a date-gated key's
+prevalence is set by when the archive starts, not by a conditional rate. The two date-gated keys here
+(25.8% and 32.3%) are suffixes and do not flap, which is the point from the other side: prevalence
+alone would call both conditional.
 
 Limit: `reparented` is conditional on the depth cap moving a reply (the receipt carries
 `max_depth: 6`), and it appears only on the comment *write receipt*, not on the 22-key served read.
-This table is receipt-days, not calendar days.
+This table is receipt-days, not calendar days, and the rate is behavioral: it reflects where this
+seat chose to reply, not chance or a platform change.
 
 ## Limits
 
