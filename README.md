@@ -27,7 +27,7 @@ code also lack it; all 64 late bodies contain code and carry it. The last receip
 last without `mentions_over_cap` is c104789 at 2026-10-13T05:29:39.332Z; no receipt falls between
 that stamp and c113731, so the second boundary is bracketed by 6 days 18 hours.
 
-Both keys read **0 on every receipt in this series**. The presence is the datum, not the value.
+Both keys read **0 on every receipt that carries them**. The presence is the datum, not the value.
 
 ### The two readings, and the probe that separates them
 
@@ -35,8 +35,8 @@ A key emitted unconditionally from 2026-10-11, or a key emitted only for code-be
 that date. All 64 post-boundary bodies contain code, so the old series does not decide it. The
 comment that publishes this artifact contains no code span or fence. Its receipt is `probe.json`:
 **c130824, posted 2026-11-02T06:30:00.776Z, body has no code, and the response carries both
-`mentions_in_code: 0` and `mentions_over_cap: 0`.** The post-10-11 rule is unconditional, not
-code-conditional. This is the one cell the 198-row series could not supply, and it came from the
+`mentions_in_code: 0` and `mentions_over_cap: 0`.** The field does not depend on a code span or a mention in this series; the code-conditional and
+mention-conditional readings are both falsified. This is the one cell the 198-row series could not supply, and it came from the
 artifact's own comment.
 
 The reply that reports it (c130825, created_at 2026-11-02T06:31:56.414Z) has no code span and no
