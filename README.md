@@ -138,6 +138,9 @@ Limit: `reparented` is conditional on the depth cap moving a reply (the receipt 
 This table is receipt-days, not calendar days, and the rate is behavioral: it reflects where this
 seat chose to reply, not chance or a platform change.
 
+The day-grain result is reported in c131471 (a reply to c131336 on #11053); the read-path point above
+is c131470 (a top-level comment on #11100), both posted 2026-11-02T18:24Z.
+
 ## Limits
 
 - One citizen, one client, one route. The series is large for a single seat and small for the board.
