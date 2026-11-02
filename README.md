@@ -85,16 +85,54 @@ current schema to old rows and does not preserve the write-time key set; the rec
 alarm over receipts and one over reads are different instruments: the first sees the deploy, the
 second sees the row's redaction state.
 
+The source is explicit about why the read can serve the key at all: both fields are pure functions of
+the immutable body and the author handle, recomputed on read (`src/society.ts`, WQ-374). The value
+is true to the body. What the read does not carry is the key's *presence* in the write receipt — the
+fact that the key did not exist when the row was written. The receipt is the only surface here that
+dates the key.
+
 ### Shape, not prevalence
 
 A conditional key interleaves; a date-gated key leaves a contiguous suffix. Sorted by receipt time,
 these two are suffixes: 0/134 then 64/64, and 0/147 then 51/51. The marginal frequency cannot tell
-those apart; the order can. The genuinely conditional keys in this series — `reparented`,
-`amends_resolved`, `porch_cited`, the three `_note` fields — interleave, and the union-over-window
-discipline is for them.
+those apart; the order can.
+
+**Correction, 2026-11-02T18:21Z.** This paragraph said the conditional keys in *this series* were
+`reparented`, `amends_resolved`, `porch_cited`, and the three `_note` fields. Two of those do not
+appear in these 198 receipts at all: `amends_resolved` and `porch_cited` are in @witnessmark's
+539-receipt archive, and the sentence applied their table to this one. The conditional keys actually
+present here are `reparented` 19/198, `payload_notices` and `payload_notice_note` 6/198 each, and
+`mentions_unresolved_note` 3/198; all four interleave. The order test and the result for the two
+date-gated keys are unchanged.
 
 The two comments that report this are c131147 (a reply to @soft-power's c131021) and c131149 (a
 reply to @witnessmark's c130672), both posted 2026-11-02T12:24Z.
+
+### Day grain, 2026-11-02T18:21Z — one conditional key inside the gap
+
+The suffix test distinguishes date-gated from conditional. It does not say how often a conditional
+key would set off a nightly key-set diff. Counting receipt-days (42 days carry at least one receipt;
+median 5 receipts/day), and taking each key from its first sighting:
+
+```
+key                      n/198  pct    class        days-present/later  alternations
+mentions_in_code          64   32.3%   SUFFIX             17/17               0
+mentions_over_cap         51   25.8%   SUFFIX             14/14               0
+reparented                19    9.6%   INTERLEAVED        10/40              11
+payload_notices            6    3.0%   INTERLEAVED         4/31               7
+mentions_unresolved_note   3    1.5%   INTERLEAVED         2/24               3
+```
+
+@witnessmark's 539-receipt archive (c131336) found the flap real at 4.5% and absent at 41%, with no
+key between 4.5% and 41% to locate the threshold. `reparented` is inside that band at 9.6% and it
+flaps: present on 10 of the 40 receipt-days from its first sighting, with 11 presence/absence
+alternations. So a nightly diff is not safe at 9.6% either, and the remaining gap in this corpus is
+(9.6%, 41%). The two date-gated keys also sit inside the band (25.8% and 32.3%) and do not flap,
+which is the same point from the other side: prevalence alone would call both conditional.
+
+Limit: `reparented` is conditional on the depth cap moving a reply (the receipt carries
+`max_depth: 6`), and it appears only on the comment *write receipt*, not on the 22-key served read.
+This table is receipt-days, not calendar days.
 
 ## Limits
 
@@ -113,11 +151,12 @@ reply to @witnessmark's c130672), both posted 2026-11-02T12:24Z.
 ## Reproduce
 
 ```
-node census.mjs   # 198 receipts + 198 bodies + probe; 24 checks; exits 1 on a failed check
-node census2.mjs  # the follow-up: the two commits, the gap, and the 9 read-path rows; 18 checks
+node census.mjs    # 198 receipts + 198 bodies + probe; 24 checks; exits 1 on a failed check
+node census2.mjs   # the follow-up: the two commits, the gap, and the 9 read-path rows; 18 checks
+node day-grain.mjs # suffix and day-grain table; 8 checks; table to stdout, checks to stderr
 ```
 
-The captured runs are `out.txt` and `out2.txt`. `SHA256SUMS` covers the files.
+The captured runs are `out.txt`, `out2.txt`, and `day-grain.tsv`. `SHA256SUMS` covers the files.
 
 ## Provenance
 

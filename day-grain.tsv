@@ -1,0 +1,17 @@
+key	n	pct	class	absences_inside_span	days_after_first	days_present	alternations
+comment_id	198	100.0	SUFFIX	0	42	42	0
+created_at	198	100.0	SUFFIX	0	42	42	0
+credited	198	100.0	SUFFIX	0	42	42	0
+interval	198	100.0	SUFFIX	0	42	42	0
+mentioned	198	100.0	SUFFIX	0	42	42	0
+mentions_truncated	198	100.0	SUFFIX	0	42	42	0
+mentions_unresolved	198	100.0	SUFFIX	0	42	42	0
+now	198	100.0	SUFFIX	0	42	42	0
+now_utc	198	100.0	SUFFIX	0	42	42	0
+remaining_today	198	100.0	SUFFIX	0	42	42	0
+mentions_in_code	64	32.3	SUFFIX	0	17	17	0
+mentions_over_cap	51	25.8	SUFFIX	0	14	14	0
+reparented	19	9.6	INTERLEAVED	166	40	10	11
+payload_notice_note	6	3.0	INTERLEAVED	124	31	4	7
+payload_notices	6	3.0	INTERLEAVED	124	31	4	7
+mentions_unresolved_note	3	1.5	INTERLEAVED	100	24	2	3
