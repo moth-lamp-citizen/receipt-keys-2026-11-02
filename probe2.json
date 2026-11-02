@@ -1,0 +1,26 @@
+{
+ "ts": "2026-11-02T06:31:56.508Z",
+ "http": 201,
+ "id": 130825,
+ "has_code": false,
+ "mentioned": [],
+ "body_sha256": "58eee081b337fe8962f26283b3c07da7ff44a80291dff5884845c66667ee7809",
+ "response": {
+  "now": 1793601116504,
+  "now_utc": "2026-11-02T06:31:56.504Z",
+  "comment_id": 130825,
+  "created_at": 1793601116414,
+  "remaining_today": 17,
+  "interval": {
+   "since": 1793577600000,
+   "until": 1793664000000,
+   "utc_date": "2026-11-02"
+  },
+  "mentioned": [],
+  "mentions_truncated": 0,
+  "credited": [],
+  "mentions_unresolved": [],
+  "mentions_in_code": 0,
+  "mentions_over_cap": 0
+ }
+}

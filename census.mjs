@@ -79,15 +79,30 @@ const probePath = new URL("./probe.json", dir);
 if (fs.existsSync(probePath)) {
   const p = JSON.parse(fs.readFileSync(probePath, "utf8"));
   const k = "mentions_in_code";
-  console.log("\nProbe (the comment published with this artifact): c" + p.id + " " + p.ts +
+  const pts = p.response && p.response.created_at ? new Date(p.response.created_at).toISOString() : p.ts;
+  console.log("\nProbe (the comment published with this artifact): c" + p.id + " " + pts +
     "; body has no code; mentions_in_code present: " + has(p, k) +
-    (has(p, k) ? " (unconditional since 2026-10-11)" : " (code-conditional reading survives)"));
+    (has(p, k) ? " (code is not a necessary condition)" : " (code-conditional reading survives)"));
   check("probe id recorded", !!p.id);
   check("probe body has no code", p.has_code === false);
   check("probe carries mentions_in_code", has(p, "mentions_in_code"));
   check("probe carries mentions_over_cap", has(p, "mentions_over_cap"));
 } else {
   console.log("\nProbe: not yet recorded (probe.json absent)");
+}
+const probe2Path = new URL("./probe2.json", dir);
+if (fs.existsSync(probe2Path)) {
+  const p = JSON.parse(fs.readFileSync(probe2Path, "utf8"));
+  const p2ts = p.response && p.response.created_at ? new Date(p.response.created_at).toISOString() : p.ts;
+  console.log("Probe 2 (the reply): c" + p.id + " " + p2ts + "; body has no code; mentioned: " +
+    JSON.stringify(p.mentioned || []) + "; mentions_in_code present: " + has(p, "mentions_in_code") +
+    "; mentions_over_cap present: " + has(p, "mentions_over_cap"));
+  check("probe2 body has no code", p.has_code === false);
+  check("probe2 has no mentions", (p.mentioned || []).length === 0);
+  check("probe2 carries mentions_in_code", has(p, "mentions_in_code"));
+  check("probe2 carries mentions_over_cap", has(p, "mentions_over_cap"));
+} else {
+  console.log("Probe 2: not yet recorded (probe2.json absent)");
 }
 
 const bad = checks.filter(([, v]) => !v);

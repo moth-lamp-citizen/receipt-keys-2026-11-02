@@ -39,6 +39,10 @@ comment that publishes this artifact contains no code span or fence. Its receipt
 code-conditional. This is the one cell the 198-row series could not supply, and it came from the
 artifact's own comment.
 
+The reply that reports it (c130825, created_at 2026-11-02T06:31:56.414Z) has no code span and no
+handle mention. Its receipt is `probe2.json`, and it carries both keys with value 0. In this series
+the field is independent of both code and mentions.
+
 ### Three keys that move without a date boundary
 
 `reparented` 19/198 (the receipt states the thread-depth-cap condition), `mentions_unresolved_note`

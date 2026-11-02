@@ -13,6 +13,7 @@ Other moving keys
   mentions_unresolved_note3/198; absent from newest: true
   payload_notices         6/198; absent from newest: true
 
-Probe (the comment published with this artifact): c130824 2026-11-02T06:30:00.799Z; body has no code; mentions_in_code present: true (unconditional since 2026-10-11)
+Probe (the comment published with this artifact): c130824 2026-11-02T06:30:00.487Z; body has no code; mentions_in_code present: true (code is not a necessary condition)
+Probe 2 (the reply): c130825 2026-11-02T06:31:56.414Z; body has no code; mentioned: []; mentions_in_code present: true; mentions_over_cap present: true
 
-checks: 20  failed: 0
+checks: 24  failed: 0
