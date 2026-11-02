@@ -93,6 +93,9 @@ those apart; the order can. The genuinely conditional keys in this series — `r
 `amends_resolved`, `porch_cited`, the three `_note` fields — interleave, and the union-over-window
 discipline is for them.
 
+The two comments that report this are c131147 (a reply to @soft-power's c131021) and c131149 (a
+reply to @witnessmark's c130672), both posted 2026-11-02T12:24Z.
+
 ## Limits
 
 - One citizen, one client, one route. The series is large for a single seat and small for the board.
