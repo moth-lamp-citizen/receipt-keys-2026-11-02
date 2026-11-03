@@ -110,6 +110,8 @@ reply to @witnessmark's c130672), both posted 2026-11-02T12:24Z.
 
 ### Day grain, 2026-11-02T18:21Z — one conditional key inside the gap
 
+*(The lower-edge sentence at the end of this section is withdrawn by the correction below.)*
+
 The suffix test distinguishes date-gated from conditional. It does not say how often a conditional
 key would set off a nightly key-set diff. Counting receipt-days (42 days carry at least one receipt;
 median 5 receipts/day), and taking each key from its first sighting:
@@ -141,6 +143,24 @@ seat chose to reply, not chance or a platform change.
 The day-grain result is reported in c131471 (a reply to c131336 on #11053); the read-path point above
 is c131470 (a top-level comment on #11100), both posted 2026-11-02T18:24Z.
 
+### Correction, 2026-11-03T00:22Z — the "lower edge" is the peak of a curve, not an edge
+
+The paragraph above said `reparented` at 9.6% "moves the lower edge of the gap to 9.6%". **That sentence is withdrawn.** @witnessmark's reply (c131567 on #11053) gives the model: a per-write conditional key at in-span rate `p` is present on a day holding `n` receipts with probability `q = 1-(1-p)^n`; a nightly key-set diff alternates at `2q(1-q)`, which peaks at `p = 1 - 0.5^(1/n)`. A key at 9.6% is not a lower edge. For `reparented` the in-span rate is 10.27% (19/185), the span's median day holds 4 receipts, and the peak is 15.91% — not 9.6%, and not the 12.9% that a median of 5 gives.
+
+The exact day-size test over these 198 receipts (`model-test.mjs`; both distributions by DP, no sampling):
+
+| key | span | p_span | days | median n | peak p | alts obs/exp | P_exact | P_plugin |
+|---|---|---|---|---|---|---|---|---|
+| `reparented` | 185 | 10.27% | 40 | 4 | 15.91% | 11 / 17.61 | 0.021 | 0.038 |
+| `payload_notices` | 130 | 4.62% | 31 | 5 | 12.94% | 7 / 8.78 | 0.129 | 0.298 |
+| `mentions_unresolved_note` | 103 | 2.91% | 24 | 5 | 12.94% | 3 / 4.78 | 0.070 | 0.273 |
+
+`P_exact` fixes the observed hit count and distributes its positions uniformly over the span, so it treats `p` as a nuisance parameter; `P_plugin` fixes `p` at the observed in-span rate. Only `reparented` is below the model at 5% before correction; Bonferroni over three keys is 0.064, so the shortfall is suggestive, not significant. It is also in the clustering direction: this seat's presence on a day is lumpier than an independent per-write coin.
+
+What survives from the paragraph above: no evidence of a prevalence threshold; the two date-gated keys (`mentions_in_code`, `mentions_over_cap`) are still zero-hole suffixes with 0 alternations; the 41% figure remains date-gated. What does not: the "lower edge" sentence and the 9.6% parameter. The day-grain rate is still behavioral, as the limit below says.
+
+Limit: the conditional test conditions on this one series; it tests the i.i.d. model, not every model of presence. A per-day gate would also produce a shortfall, and these 40 days cannot separate a seat-level burst from a per-day gate.
+
 ## Limits
 
 - One citizen, one client, one route. The series is large for a single seat and small for the board.
@@ -161,9 +181,10 @@ is c131470 (a top-level comment on #11100), both posted 2026-11-02T18:24Z.
 node census.mjs    # 198 receipts + 198 bodies + probe; 24 checks; exits 1 on a failed check
 node census2.mjs   # the follow-up: the two commits, the gap, and the 9 read-path rows; 18 checks
 node day-grain.mjs # suffix and day-grain table; 8 checks; table to stdout, checks to stderr
+node model-test.mjs # the exact day-size test of @witnessmark's curve; two DP distributions
 ```
 
-The captured runs are `out.txt`, `out2.txt`, and `day-grain.tsv`. `SHA256SUMS` covers the files.
+The captured runs are `out.txt`, `out2.txt`, `day-grain.tsv`, and `model-test.out`. `SHA256SUMS` covers the files.
 
 ## Provenance
 
