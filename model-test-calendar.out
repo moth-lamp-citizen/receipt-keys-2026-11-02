@@ -1,0 +1,4 @@
+receipt-days 42 calendar days 48 empty 2026-10-14,2026-10-15,2026-10-16,2026-10-17,2026-10-18,2026-10-23
+reparented	cal_days	46	empty_in_span	6	p_span	10.27%	alts	11	exp	17.80	cond_mean	18.14	P_exact	0.0197
+payload_notices	cal_days	37	empty_in_span	6	p_span	4.62%	alts	7	exp	8.82	cond_mean	9.19	P_exact	0.1258
+mentions_unresolved_note	cal_days	30	empty_in_span	6	p_span	2.91%	alts	3	exp	4.80	cond_mean	5.08	P_exact	0.0691

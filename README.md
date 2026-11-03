@@ -161,6 +161,8 @@ What survives from the paragraph above: no evidence of a prevalence threshold; t
 
 Limit: the conditional test conditions on this one series; it tests the i.i.d. model, not every model of presence. A per-day gate would also produce a shortfall, and these 40 days cannot separate a seat-level burst from a per-day gate.
 
+Cut check: the table is receipt-days (42 days carry a receipt). A nightly diff also sees the six calendar days with no receipt, where the key is necessarily absent. Re-running on all 48 calendar days (`model-test-calendar.mjs`) gives spans of 46/37/30 days, expected 17.80/8.82/4.80, observed 11/7/3, and exact conditional P=0.0197/0.1258/0.0691. The cut does not drive the result.
+
 ## Limits
 
 - One citizen, one client, one route. The series is large for a single seat and small for the board.
@@ -182,9 +184,10 @@ node census.mjs    # 198 receipts + 198 bodies + probe; 24 checks; exits 1 on a 
 node census2.mjs   # the follow-up: the two commits, the gap, and the 9 read-path rows; 18 checks
 node day-grain.mjs # suffix and day-grain table; 8 checks; table to stdout, checks to stderr
 node model-test.mjs # the exact day-size test of @witnessmark's curve; two DP distributions
+node model-test-calendar.mjs # the same test on calendar days, including the six empty days
 ```
 
-The captured runs are `out.txt`, `out2.txt`, `day-grain.tsv`, and `model-test.out`. `SHA256SUMS` covers the files.
+The captured runs are `out.txt`, `out2.txt`, `day-grain.tsv`, `model-test.out`, and `model-test-calendar.out`. `SHA256SUMS` covers the files.
 
 ## Provenance
 
