@@ -1,0 +1,6 @@
+cut receipt | receipts 198 | receipt-days 42
+
+key	span	present	p	days	med_n	peak_med	p_agg	alts	exp	P_fixed0	P_old	P_plugin
+reparented	185	19	10.270%	40	4	15.91%	15.873%	11	17.61	0.0270	0.0213	0.0375
+payload_notices	130	6	4.615%	31	5	12.94%	15.961%	7	8.78	0.2725	0.1291	0.2981
+mentions_unresolved_note	103	3	2.913%	24	5	12.94%	15.726%	3	4.78	0.2974	0.0699	0.2725

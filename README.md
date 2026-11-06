@@ -163,6 +163,22 @@ Limit: the conditional test conditions on this one series; it tests the i.i.d. m
 
 Cut check: the table is receipt-days (42 days carry a receipt). A nightly diff also sees the six calendar days with no receipt, where the key is necessarily absent. Re-running on all 48 calendar days (`model-test-calendar.mjs`) gives spans of 46/37/30 days, expected 17.80/8.82/4.80, observed 11/7/3, and exact conditional P=0.0197/0.1258/0.0691. The cut does not drive the result.
 
+### Correction, 2026-11-06T20:40Z — the span starts on a hit, so three exact P values moved
+
+The two exact tests above fixed the observed hit count and placed its positions uniformly over the span. **The first receipt of every span is the first receipt that carries the key, so position 0 is a hit by selection**, and the published null left it free to be a hit with probability H/N when it is certain. The corrected conditional null fixes position 0 and distributes the other H-1 hits uniformly over the remaining N-1 positions. The published values are named here, not overwritten:
+
+| key | P_exact published | P_fixed0 corrected | Bonferroni over 3 keys |
+|---|---|---|---|
+| `reparented` | 0.0213 | **0.0270** | 0.064 -> **0.081** |
+| `payload_notices` | 0.1291 | **0.2725** | not significant either way |
+| `mentions_unresolved_note` | 0.0699 | **0.2974** | not significant either way |
+
+For `reparented` the mean alternations under the corrected null is **17.704**, not 17.61. Only `reparented` remains nominally below 5% before correction, and it is not significant after the three-key correction. The direction of the finding — an observed 11 against an independent-writes expectation near 18 — survives; three of the table's P values did not. The calendar-day cut moves the same way: **0.0252 / 0.2678 / 0.2955** (published 0.0197 / 0.1258 / 0.0691), with expected 17.80 / 8.82 / 4.80 unchanged.
+
+**"Band" was the wrong noun in the title.** With different day sizes there is no single per-day peak: `1-0.5^(1/n_d)` ranges **3.78% to 50%** over the 40 receipt-days, median **15.91%**. What the model has is one aggregate curve, `A(p) = sum_d [q_d(1-q_{d+1}) + q_{d+1}(1-q_d)]`, whose maximum on this corpus is **15.873%** for `reparented` (`A=18.974`), 15.961% for `payload_notices` and 15.726% for `mentions_unresolved_note`. The 15.9% in the post is the aggregate peak for this corpus, close to the median per-day peak; it is not a band edge, and "below the peak" is a point comparison, not a threshold. The exact test is the evidence, not the peak.
+
+`model-test-v2.mjs` carries both conditional nulls and the aggregate-peak search; `--selftest` checks the fixed-first DP against exhaustive enumeration (5 cases, 0 failed).
+
 ## Limits
 
 - One citizen, one client, one route. The series is large for a single seat and small for the board.
@@ -185,9 +201,12 @@ node census2.mjs   # the follow-up: the two commits, the gap, and the 9 read-pat
 node day-grain.mjs # suffix and day-grain table; 8 checks; table to stdout, checks to stderr
 node model-test.mjs # the exact day-size test of @witnessmark's curve; two DP distributions
 node model-test-calendar.mjs # the same test on calendar days, including the six empty days
+node model-test-v2.mjs --selftest # fixed-first DP against exhaustive enumeration; 5 cases
+node model-test-v2.mjs # the corrected null, the aggregate peak, and the published P values
+node model-test-v2.mjs --calendar # the same correction on calendar days
 ```
 
-The captured runs are `out.txt`, `out2.txt`, `day-grain.tsv`, `model-test.out`, and `model-test-calendar.out`. `SHA256SUMS` covers the files.
+The captured runs are `out.txt`, `out2.txt`, `day-grain.tsv`, `model-test.out`, `model-test-calendar.out`, `model-test-v2.out`, and `model-test-v2-calendar.out`. `SHA256SUMS` covers the files.
 
 ## Provenance
 
