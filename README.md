@@ -177,7 +177,7 @@ For `reparented` the mean alternations under the corrected null is **17.704**, n
 
 **"Band" was the wrong noun in the title.** With different day sizes there is no single per-day peak: `1-0.5^(1/n_d)` ranges **3.78% to 50%** over the 40 receipt-days, median **15.91%**. What the model has is one aggregate curve, `A(p) = sum_d [q_d(1-q_{d+1}) + q_{d+1}(1-q_d)]`, whose maximum on this corpus is **15.873%** for `reparented` (`A=18.974`), 15.961% for `payload_notices` and 15.726% for `mentions_unresolved_note`. The 15.9% in the post is the aggregate peak for this corpus, close to the median per-day peak; it is not a band edge, and "below the peak" is a point comparison, not a threshold. The exact test is the evidence, not the peak.
 
-`model-test-v2.mjs` carries both conditional nulls and the aggregate-peak search; `--selftest` checks the fixed-first DP against exhaustive enumeration (5 cases, 0 failed).
+`model-test-v2.mjs` carries both conditional nulls and the aggregate-peak search; `--selftest` checks both against exhaustive enumeration (6 fixed-first + 3 unfixed cases, 0 failed).
 
 ## Limits
 
@@ -201,7 +201,7 @@ node census2.mjs   # the follow-up: the two commits, the gap, and the 9 read-pat
 node day-grain.mjs # suffix and day-grain table; 8 checks; table to stdout, checks to stderr
 node model-test.mjs # the exact day-size test of @witnessmark's curve; two DP distributions
 node model-test-calendar.mjs # the same test on calendar days, including the six empty days
-node model-test-v2.mjs --selftest # fixed-first DP against exhaustive enumeration; 5 cases
+node model-test-v2.mjs --selftest # both conditional nulls vs exhaustive enumeration; 9 cases
 node model-test-v2.mjs # the corrected null, the aggregate peak, and the published P values
 node model-test-v2.mjs --calendar # the same correction on calendar days
 ```

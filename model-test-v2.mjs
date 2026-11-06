@@ -112,40 +112,52 @@ const cdfLE = (dist,n)=>Array.isArray(dist)
   ? dist.slice(0,n+1).reduce((s,v)=>s+v,0)
   : [...Array(n+1).keys()].reduce((s,k)=>s+(dist.get(k)||0),0);
 
-// Exact check of condFixedFirst against exhaustive subset enumeration on small inputs.
+// Exact check of both conditional nulls against exhaustive subset enumeration on
+// small inputs. The fixed-first cases include an empty day in the middle, which is
+// the calendar-cut case; the unfixed cases check the null that produced P_old.
 function selftest(){
-  function brute(ns,H){
+  function brute(ns,H,fixed){
     const N = ns.reduce((a,b)=>a+b,0), day=[]; let d=0;
     for (const n of ns){ for (let i=0;i<n;i++) day.push(d); d++; }
     let tot=0; const out=new Map();
     (function rec(i,left,hits){
       if (i===N){
         if (left!==0) return;
-        const flags=Array(ns.length).fill(false); flags[0]=true; // position 0 fixed
+        const flags=Array(ns.length).fill(false);
+        if (fixed) flags[0]=true; // position 0 fixed
         for (const p of hits) flags[day[p]]=true;
         let a=0; for (let k=1;k<flags.length;k++) if (flags[k]!==flags[k-1]) a++;
         out.set(a,(out.get(a)||0)+1); tot++; return;
       }
       rec(i+1,left,hits);
       if (left>0){ hits.push(i); rec(i+1,left-1,hits); hits.pop(); }
-    })(1,H-1,[]);
+    })(fixed?1:0, fixed?H-1:H, []);
     for (const [k,v] of out) out.set(k,v/tot);
     return out;
   }
-  const cases = [
-    [[3,2,2],4], [[4,3,1],3], [[2,2,2],2], [[5,1,1],3], [[1,4,2,2],4]
-  ];
-  let fail=0;
-  for (const [ns,H] of cases){
-    const a=condFixedFirst(ns,H), b=brute(ns,H);
-    const keys=[...new Set([...a.keys(),...b.keys()])].sort((x,y)=>x-y);
-    for (const k of keys){
-      if (Math.abs((a.get(k)||0)-(b.get(k)||0)) > 1e-12){
-        console.log("FAIL", JSON.stringify(ns), H, k, a.get(k), b.get(k)); fail++;
+  function check(label, distFn, cases, fixed){
+    let fail=0;
+    for (const [ns,H] of cases){
+      const a=distFn(ns,H), b=brute(ns,H,fixed);
+      const keys=[...new Set([...a.keys(),...b.keys()])].sort((x,y)=>x-y);
+      for (const k of keys){
+        if (Math.abs((a.get(k)||0)-(b.get(k)||0)) > 1e-12){
+          console.log("FAIL", label, JSON.stringify(ns), H, k, a.get(k), b.get(k)); fail++;
+        }
       }
     }
+    return fail;
   }
-  console.log("selftest:", cases.length, "cases,", fail, "failed");
+  const fixedCases = [
+    [[3,2,2],4], [[4,3,1],3], [[2,2,2],2], [[5,1,1],3], [[1,4,2,2],4], [[2,0,3],3]
+  ];
+  const unfixedCases = [
+    [[3,2,2],4], [[2,0,3],3], [[1,4,2,2],4]
+  ];
+  const fail = check("fixed-first", condFixedFirst, fixedCases, true)
+             + check("unfixed", condUnfixed, unfixedCases, false);
+  console.log("selftest:", fixedCases.length, "fixed-first +", unfixedCases.length,
+    "unfixed cases,", fail, "failed");
   process.exit(fail?1:0);
 }
 if (process.argv.includes("--selftest")) selftest();
